@@ -1,41 +1,37 @@
+import pytest
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from locators import Locators
-from auth import Auth
-import unittest
+import time
+class TestConstructor:
 
-class TestAuth(unittest.TestCase):
+    @pytest.fixture
+    def driver(self):
+        driver = webdriver.Chrome()
+        yield driver
+        driver.quit()
 
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Chrome()
+    def test_go_to_section_sauces(self, driver):
+        driver.get("https://stellarburgers.nomoreparties.site/")
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable(Locators.SECTION_SAUCE)).click()
+        assert WebDriverWait(driver,3).until(
+            EC.visibility_of_element_located(Locators.LABEL_SAUCES_TAB)).text == 'Соусы'
 
-    def test_go_to_section_sauces(self):
-        Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
-        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-        driver.find_element(*Locators.SECTION_SAUCE).click()
+    def test_go_to_section_rolls(self, driver):
+        driver.get("https://stellarburgers.nomoreparties.site/")
 
-        assert WebDriverWait(driver, 5).until(
-            EC.visibility_of_element_located(LABEL_BURGER_INGREDIENTS)).text == 'Соусы'
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable(Locators.SECTION_TOPPINGS)).click()
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable(Locators.SECTION_ROLLS)).click()
 
-    def test_go_to_section_rolls(self):
-        Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
-        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-        driver.find_element(*Locators.SECTION_ROLLS).click()
+        assert WebDriverWait(driver,3).until(
+            EC.visibility_of_element_located(Locators.LABEL_ROLLS_TAB)).text == 'Булки'
 
-        assert WebDriverWait(driver, 5).until(
-            EC.visibility_of_element_located(LABEL_BURGER_INGREDIENTS)).text == 'Булки'
+    def test_go_to_section_toppings(self, driver):
+        driver.get("https://stellarburgers.nomoreparties.site/")
 
-    def test_go_to_section_toppings(self):
-        Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
-        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-        driver.find_element(*Locators.SECTION_TOPPINGS).click()
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable(Locators.SECTION_TOPPINGS)).click()
 
-        assert WebDriverWait(driver, 5).until(
-            EC.visibility_of_element_located(LABEL_BURGER_INGREDIENTS)).text == 'Начинки'
+        assert WebDriverWait(driver,3).until(
+            EC.visibility_of_element_located(Locators.LABEL_TOPPINGS_TAB)).text == 'Начинки'

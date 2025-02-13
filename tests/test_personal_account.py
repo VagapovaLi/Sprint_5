@@ -1,31 +1,24 @@
-import random
+import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
+from helper import Auth
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from locators import Locators
-from auth import Auth
-import unittest
 
-class TestAuth(unittest.TestCase):
+class TestAuth:
 
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Chrome()
+    @pytest.fixture
+    def driver(self):
+        driver = webdriver.Chrome()
+        yield driver
+        driver.quit()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
+    def test_button_login_account(self,driver):
+        Auth.login(driver, email='liana@mail.ru', password='123456', use_personal_account=True)
+        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
 
-#переход по клику на «Личный кабинет
-def test_button_login_account(self):
-    Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
-
-    driver.find_element(BUTTON_PERSONAL_ACCOUNT).click()
-
-    WebDriverWait(driver, 10).until(EC.url_to_be('https://stellarburgers.nomoreparties.site/account/profile'))
-
-    assert driver.current_url == 'https://stellarburgers.nomoreparties.site/account/profile'
+        assert WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located(Locators.TEXT_PROFILE))
 
 
 

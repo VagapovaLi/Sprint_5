@@ -1,38 +1,34 @@
-import random
+import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
+from helper import Auth
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from locators import Locators
-from auth import Auth
-import unittest
-from locators import Locators
 
 
-class TestAuth(unittest.TestCase):
+class TestAuth:
 
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Chrome()
+    @pytest.fixture
+    def driver(self):
+        driver = webdriver.Chrome()
+        yield driver
+        driver.quit()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
+    def test_click_on_constructor(self, driver):
+        Auth.login(driver, email='liana@mail.ru', password='123456', use_personal_account=True)
 
-def test_click_on_constructor(self):
-    Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
+        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
+        driver.find_element(*Locators.BUTTON_CONSTRUCTOR).click()
 
-    driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-    driver.find_element(*Locators.BUTTON_CONSTRUCTOR).click()
+        assert WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located(Locators.BUTTON_PLACE_ORDER))
 
-    WebDriverWait(driver, 10).until(EC.url_to_be('https://stellarburgers.nomoreparties.site/'))
-    assert driver.current_url == 'https://stellarburgers.nomoreparties.site/'
 
-def test_click_on_stellar_burgers(self):
-    Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
+    def test_click_on_stellar_burgers(self, driver):
+        Auth.login(driver, email='liana@mail.ru', password='123456', use_personal_account=True)
 
-    driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-    driver.find_element(*Locators.BUTTON_STELLAR_BURGERS).click()
+        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
+        driver.find_element(*Locators.BUTTON_STELLAR_BURGERS).click()
 
-    WebDriverWait(driver, 10).until(EC.url_to_be('https://stellarburgers.nomoreparties.site/'))
-    assert driver.current_url == 'https://stellarburgers.nomoreparties.site/'
+        assert WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located(Locators.BUTTON_PLACE_ORDER))

@@ -1,23 +1,28 @@
+import pytest
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
+from helper import Auth
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from locators import Locators
-from auth import Auth
-import unittest
+import time
 
-class TestAuth(unittest.TestCase):
+LOGIN_URL = "https://stellarburgers.nomoreparties.site/login"
+class TestAuth:
 
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Chrome()
+    @pytest.fixture
+    def driver(self):
+        driver = webdriver.Chrome()
+        yield driver
+        driver.quit()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
 
-def test_logout_by_bytton_logout(self):
-    Auth.login(self.driver, email='liana@mail.ru', password='123456', use_personal_account=False)
+    def test_logout_byt_logout(self,driver):
+        Auth.login(driver, email='liana@mail.ru', password='123456', use_personal_account=True)
 
-    driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
-    driver.find_element(*Locators.BUTTON_LOGOUT_PERSONAL_ACCOUNT).click()
+        driver.find_element(*Locators.BUTTON_PERSONAL_ACCOUNT).click()
+
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(Locators.BUTTON_LOGOUT_PERSONAL_ACCOUNT)).click()
+
+        WebDriverWait(driver, 10).until(EC.url_to_be(LOGIN_URL))
+        assert driver.current_url == LOGIN_URL
